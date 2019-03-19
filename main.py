@@ -10,16 +10,24 @@ cfg.read("config.ini")
 SOURCE = cfg["paths"]["source"]
 DEST = cfg["paths"]["dest"]
 
+if not os.path.exists(SOURCE):
+    raise ValueError(f'Source dir must exist: "{SOURCE}" does not')
+if not os.path.exists(DEST):
+    raise ValueError(f'Dest dir must exist: "{DEST}" does not')
+
+bitrate = int(cfg["transcoding"]["bitrate"])
+outsuffix = cfg["transcoding"]["transcode to"]
+
 
 def want_transcode(source_path: Path) -> bool:
     """Determine whether the file at source_path should be transcoded."""
-    return source_path.suffix in cfg["filetypes"]["to transcode"].split(",")
+    return source_path.suffix in cfg["transcoding"]["to transcode"].split(",")
 
 
 def transcode(in_path: Path, out_path: Path) -> None:
     """Transcode the file at in_path and put the result at out_path"""
     subprocess.run('ffmpeg -y -hide_banner -loglevel warning'
-                   f' -i "{in_path}" -b:a 128000 "{out_path}"')
+                   f' -i "{in_path}" -b:a {bitrate} "{out_path}"')
 
 
 def to_dest(source_path: Path) -> Path:
@@ -41,7 +49,7 @@ def main():
             source_path = Path(root, file)
             dest_path = to_dest(source_path)
             if want_transcode(source_path):
-                dest_path = dest_path.with_suffix(".opus")
+                dest_path = dest_path.with_suffix(outsuffix)
 
             # source_path maps to this path so we want to keep it
             good_dests.add(dest_path)
