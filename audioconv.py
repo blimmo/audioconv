@@ -1,27 +1,42 @@
+"""Mirrors a directory tree, transcoding lossless audio files
+and linking all other files.
+
+Either pass the path of the root of the source tree and the root of the mirror
+as command line arguments or place a config.ini in the same directory as the
+script. See https://github.com/blimmo/audioconv for a template config.
+"""
+
 from configparser import ConfigParser
 import os
 from pathlib import Path
 import subprocess
+import sys
 
 
 cfg = ConfigParser()
-cfg.read("config.ini")
+if not cfg.read("config.ini") and len(sys.argv) != 3:
+    raise ValueError("Must pass source and dest dirs if no config")
 
-SOURCE = cfg["paths"]["source"]
-DEST = cfg["paths"]["dest"]
+if len(sys.argv) > 1:
+    SOURCE, DEST = sys.argv[1:]
+else:
+    SOURCE = cfg["paths"]["source"]
+    DEST = cfg["paths"]["dest"]
 
 if not os.path.exists(SOURCE):
     raise ValueError(f'Source dir must exist: "{SOURCE}" does not')
 if not os.path.exists(DEST):
     raise ValueError(f'Dest dir must exist: "{DEST}" does not')
 
-bitrate = int(cfg["transcoding"]["bitrate"])
-outsuffix = cfg["transcoding"]["transcode to"]
+bitrate = cfg.getint("transcoding", "bitrate", fallback=128000)
+transcode_to = cfg.get("transcoding", "transcode to", fallback=".opus")
+to_transcode = cfg.get("transcoding", "to transcode",
+                       fallback=".flac").split(",")
 
 
 def want_transcode(source_path: Path) -> bool:
     """Determine whether the file at source_path should be transcoded."""
-    return source_path.suffix in cfg["transcoding"]["to transcode"].split(",")
+    return source_path.suffix in to_transcode
 
 
 def transcode(in_path: Path, out_path: Path) -> None:
@@ -49,7 +64,7 @@ def main():
             source_path = Path(root, file)
             dest_path = to_dest(source_path)
             if want_transcode(source_path):
-                dest_path = dest_path.with_suffix(outsuffix)
+                dest_path = dest_path.with_suffix(transcode_to)
 
             # source_path maps to this path so we want to keep it
             good_dests.add(dest_path)
