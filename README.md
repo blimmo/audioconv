@@ -6,13 +6,10 @@ Mirrors a directory structure transcoding lossless audio to save space.
 - Links everything else (such as lossy audio files) so there's no duplication
 of data.
 - Removes files from the mirror when they're deleted in the source.
-- Only one source file (plus an optional config file).
+- Only one source file.
 
 ## Installation
 Download `audioconv.py`.
-
-Optionally also download `config.ini` and put it in the same directory as the 
-script.
 
 You will also need ffmpeg on your PATH.
 
@@ -23,5 +20,22 @@ You will also need ffmpeg on your PATH.
 empty directory or existing mirror. Everything in `dest` that isn't in `source`
 will be removed.
 
-If you downloaded `config.ini`,  set `source` and `dest` in it and you can just
-run `python audioconv.py` whenever you want to syncronise the folders.
+For docs on additional arguments use `python audioconv.py -h`
+
+## Config
+Placing a file called `audioconv.conf` in the same directory as the .py file
+will cause it to be parsed as command line arguments. So for example: 
+
+```
+music
+musiclossy
+
+-b 192000
+-t .wav .flac
+-o .mp3
+```
+
+Will mirror the music and musiclossy directories, transcoding .wav and .flac 
+files to mp3s with bitrate 192000.
+
+Arguments in config files can be overriden at the command line.
