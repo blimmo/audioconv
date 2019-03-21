@@ -35,7 +35,7 @@ musiclossy
 -o .mp3
 ```
 
-Will mirror the music and musiclossy directories, transcoding .wav and .flac 
-files to mp3s with bitrate 192000.
+Will mirror the music directory to the musiclossy directory, transcoding .wav 
+and .flac files to mp3s with bitrate 192000.
 
 Arguments in config files can be overriden at the command line.
