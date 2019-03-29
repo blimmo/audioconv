@@ -6,12 +6,12 @@ Mirrors a directory structure transcoding lossless audio to save space.
 - Links everything else (such as lossy audio files) so there's no duplication
 of data.
 - Removes files from the mirror when they're deleted in the source.
-- Only one source file.
+- Single file script so easy installation.
 
 ## Installation
 Download `audioconv.py`.
 
-You will also need ffmpeg on your PATH.
+You will need [python 3.6+](https://www.python.org/downloads/) and also [ffmpeg](https://www.ffmpeg.org/download.html) on your PATH.
 
 ## Usage
 `python audioconv.py <source> <dest>`
