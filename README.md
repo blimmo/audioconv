@@ -9,7 +9,7 @@ of data.
 - Single file script so easy installation.
 
 ## Installation
-Download `audioconv.py`.
+[Download](https://raw.githubusercontent.com/blimmo/audioconv/master/audioconv.py) `audioconv.py`.
 
 You will need [python 3.6+](https://www.python.org/downloads/) and also [ffmpeg](https://www.ffmpeg.org/download.html) on your PATH.
 
