@@ -6,6 +6,9 @@ import subprocess
 import sys
 
 
+CONF = os.path.join(os.path.dirname(__file__), "audioconv.conf")
+
+
 class Mirrorer:
     """Mirrors a directory tree, transcoding lossless audio files
     and linking all other files.
@@ -50,13 +53,15 @@ class Mirrorer:
                 # source_path maps to this path so we want to keep it
                 good_dests.add(dest_path)
 
-                if (dest_path.exists()
-                        and self.time(source_path) <= self.time(dest_path)):
+                if dest_path.exists():
                     # already done this file on a previous run
-                    # if a file that needs to be transcoded is updated it will
-                    # be retranscoded, but linked files always have equal
-                    # mtimes so will never get past this continue.
-                    continue
+                    if self.time(source_path) <= self.time(dest_path):
+                        # old version is fine
+                        continue
+                    else:
+                        # need to update so remove old file
+                        print("Removing", dest_path, "for update")
+                        os.remove(dest_path)
 
                 if self.want_transcode(source_path):
                     print("Transcoding", source_path)
@@ -103,8 +108,8 @@ def main(args=sys.argv[1:]):
                              "transcoding that ffmpeg does.")
 
     # get defaults from config file
-    if os.path.exists("audioconv.conf"):
-        with open("audioconv.conf") as f:
+    if os.path.exists(CONF):
+        with open(CONF) as f:
             conf = shlex.split(f.read(), comments=True)
             parser.set_defaults(**vars(parser.parse_args(conf)))
     opts = parser.parse_args(args)
